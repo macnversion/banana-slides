@@ -2,7 +2,8 @@
 Inpainting 服务
 提供基于多种 provider 的图像区域消除和背景重新生成功能
 支持的 provider:
-- volcengine: 火山引擎 Inpainting
+- volcengine: 火山引擎 Inpainting（需要 VOLCENGINE_ACCESS_KEY + SECRET_KEY）
+- volcengine_ark: 火山引擎方舟图片编辑（使用 ARK_API_KEY + IMAGE_MODEL）
 - gemini: Google Gemini 2.5 Flash Image Preview
 """
 import logging
@@ -11,6 +12,10 @@ from PIL import Image
 
 from services.ai_providers.image.volcengine_inpainting_provider import VolcengineInpaintingProvider
 from services.ai_providers.image.gemini_inpainting_provider import GeminiInpaintingProvider
+from services.ai_providers.image.volcengine_ark_inpainting_provider import (
+    VolcengineArkInpaintingProvider,
+    create_volcengine_ark_inpainting_provider
+)
 from utils.mask_utils import (
     create_mask_from_bboxes,
     create_inverse_mask_from_bboxes,
@@ -26,52 +31,78 @@ logger = logging.getLogger(__name__)
 class InpaintingService:
     """
     Inpainting 服务类
-    
+
     主要功能：
     1. 从 bbox 生成掩码图像
     2. 调用 inpainting provider 消除指定区域
     3. 提供便捷的背景重生成接口
-    
+
     支持的 provider:
-    - volcengine: 火山引擎 Inpainting
+    - volcengine: 火山引擎 Inpainting（需要 VOLCENGINE_ACCESS_KEY + SECRET_KEY）
+    - volcengine_ark: 火山引擎方舟图片编辑（使用 ARK_API_KEY + IMAGE_MODEL）
     - gemini: Google Gemini 2.5 Flash Image Preview
     """
-    
-    def __init__(self, provider=None, provider_type: str = "volcengine"):
+
+    def __init__(self, provider=None, provider_type: str = "volcengine_ark"):
         """
         初始化 Inpainting 服务
-        
+
         Args:
             provider: Inpainting 提供者实例，如果为 None 则从配置创建
-            provider_type: Provider 类型 ('volcengine' 或 'gemini')
+            provider_type: Provider 类型 ('volcengine', 'volcengine_ark', 'gemini')
         """
         if provider is None:
             config = get_config()
-            
+
             if provider_type == "gemini":
                 # 使用 Gemini Inpainting Provider
                 api_key = config.GOOGLE_API_KEY
                 api_base = config.GOOGLE_API_BASE
                 timeout = config.GENAI_TIMEOUT
-                
+
                 if not api_key:
                     raise ValueError("Google API Key 未配置")
-                
+
                 self.provider = GeminiInpaintingProvider(
                     api_key=api_key,
                     api_base=api_base,
                     timeout=timeout
                 )
                 self.provider_type = "gemini"
+
+            elif provider_type == "volcengine_ark":
+                # 使用火山引擎方舟图片编辑（统一使用 ARK_API_KEY）
+                api_key = config.ARK_API_KEY
+                api_base = config.ARK_API_BASE
+                model = config.IMAGE_MODEL
+
+                if not api_key:
+                    raise ValueError("火山引擎方舟 API Key (ARK_API_KEY) 未配置")
+
+                provider_instance = create_volcengine_ark_inpainting_provider(
+                    api_key=api_key,
+                    api_base=api_base,
+                    model=model
+                )
+
+                if not provider_instance:
+                    raise ValueError("创建火山引擎方舟图片编辑 Provider 失败")
+
+                self.provider = provider_instance
+                self.provider_type = "volcengine_ark"
+
             else:
-                # 使用火山引擎 Inpainting Provider（默认）
+                # 使用火山引擎 Inpainting Provider（需要 ACCESS_KEY + SECRET_KEY）
                 access_key = config.VOLCENGINE_ACCESS_KEY
                 secret_key = config.VOLCENGINE_SECRET_KEY
                 timeout = config.VOLCENGINE_INPAINTING_TIMEOUT
-                
+
                 if not access_key or not secret_key:
-                    raise ValueError("火山引擎 Access Key 和 Secret Key 未配置")
-                
+                    raise ValueError(
+                        "火山引擎 Access Key 和 Secret Key 未配置。"
+                        "推荐使用 provider_type='volcengine_ark'，统一使用 ARK_API_KEY。"
+                    )
+
                 self.provider = VolcengineInpaintingProvider(
                     access_key=access_key,
                     secret_key=secret_key,
@@ -81,7 +112,7 @@ class InpaintingService:
         else:
             self.provider = provider
             self.provider_type = provider_type
-        
+
         self.config = get_config()
     
     def remove_regions_by_bboxes(

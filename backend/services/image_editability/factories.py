@@ -674,32 +674,43 @@ class ServiceConfig:
 
 class TextAttributeExtractorFactory:
     """文字属性提取器工厂"""
-    
+
     @staticmethod
     def create_caption_model_extractor(
         ai_service: Optional[Any] = None,
-        prompt_template: Optional[str] = None
+        prompt_template: Optional[str] = None,
+        use_vision_service: bool = True
     ) -> TextAttributeExtractor:
         """
         创建基于Caption Model的文字属性提取器
-        
+
         使用视觉语言模型（如Gemini）分析文字区域图像，
         通过生成JSON的方式获取字体颜色、是否粗体、是否斜体等属性。
-        
+
         Args:
             ai_service: AIService实例（可选，如果不提供则自动获取）
             prompt_template: 自定义的prompt模板（可选），必须使用 {content_hint} 作为占位符
-        
+            use_vision_service: 是否使用视觉AI服务（默认True，使用IMAGE_CAPTION_MODEL）
+
         Returns:
             CaptionModelTextAttributeExtractor实例
-        
+
         Raises:
             如果AI服务初始化失败，会抛出异常
         """
         if ai_service is None:
-            from services.ai_service_manager import get_ai_service
-            ai_service = get_ai_service()
-        
+            from services.ai_service_manager import get_ai_service, get_vision_ai_service
+            # 使用视觉AI服务（配置了独立的视觉模型）
+            if use_vision_service:
+                try:
+                    ai_service = get_vision_ai_service()
+                    logger.info("使用Vision AIService（IMAGE_CAPTION_MODEL）")
+                except Exception as e:
+                    logger.warning(f"Vision AIService初始化失败，回退到普通AIService: {e}")
+                    ai_service = get_ai_service()
+            else:
+                ai_service = get_ai_service()
+
         logger.info("创建CaptionModelTextAttributeExtractor")
         return CaptionModelTextAttributeExtractor(ai_service, prompt_template)
     

@@ -11,12 +11,18 @@ Benefits:
 - Thread-safe for Flask multi-threaded environment
 
 Usage:
-    from services.ai_service_manager import get_ai_service
-    
+    from services.ai_service_manager import get_ai_service, get_vision_ai_service
+
     # In your controller
     ai_service = get_ai_service()
     outline = ai_service.generate_outline(project_context)
+
+    # For vision tasks (OCR, image analysis)
+    vision_service = get_vision_ai_service()
+    result = vision_service.generate_json_with_image(...)
 """
+
+__all__ = ['get_ai_service', 'get_vision_ai_service', 'clear_ai_service_cache', 'get_provider_cache_info']
 
 import logging
 from threading import Lock
@@ -78,58 +84,123 @@ def _get_cached_image_provider(model: str) -> ImageProvider:
 def get_ai_service(force_new: bool = False) -> AIService:
     """
     Get the singleton AIService instance with optimized provider caching
-    
+
     This function creates and returns a singleton AIService instance that reuses
     AI providers (TextProvider and ImageProvider) across requests, significantly
     reducing initialization overhead.
-    
+
     Args:
         force_new: If True, forces creation of a new instance (useful for testing)
-        
+
     Returns:
         AIService singleton instance with cached providers
-        
+
     Note:
         The providers are cached per model name. If TEXT_MODEL or IMAGE_MODEL
         changes in Flask config, new providers will be created automatically.
     """
     global _ai_service_instance
-    
+
     if force_new:
         with _lock:
             logger.info("Force creating new AIService instance")
             _ai_service_instance = None
-    
+
     if _ai_service_instance is None:
         with _lock:
             # Double-check locking pattern
             if _ai_service_instance is None:
                 logger.info("Initializing AIService singleton with provider caching")
-                
+
                 # Get model names from Flask config or use defaults
                 from config import get_config
                 config = get_config()
-                
+
                 if has_app_context() and current_app and hasattr(current_app, "config"):
                     text_model = current_app.config.get("TEXT_MODEL", config.TEXT_MODEL)
                     image_model = current_app.config.get("IMAGE_MODEL", config.IMAGE_MODEL)
                 else:
                     text_model = config.TEXT_MODEL
                     image_model = config.IMAGE_MODEL
-                
+
                 # Get cached providers
                 text_provider = _get_cached_text_provider(text_model)
                 image_provider = _get_cached_image_provider(image_model)
-                
+
                 # Create AIService with cached providers
                 _ai_service_instance = AIService(
                     text_provider=text_provider,
                     image_provider=image_provider
                 )
-                
+
                 logger.info(f"AIService singleton created with models: text={text_model}, image={image_model}")
-    
+
     return _ai_service_instance
+
+
+# Vision AI service singleton (for image understanding/OCR)
+_vision_ai_service_instance: Optional[AIService] = None
+_vision_lock = Lock()
+
+
+def get_vision_ai_service(force_new: bool = False) -> AIService:
+    """
+    Get the singleton Vision AIService instance for image understanding tasks
+
+    This function creates a separate AIService instance optimized for vision tasks
+    (OCR, image analysis, table extraction) using IMAGE_CAPTION_MODEL.
+
+    Args:
+        force_new: If True, forces creation of a new instance (useful for testing)
+
+    Returns:
+        AIService singleton instance with vision-optimized text provider
+
+    Note:
+        Uses IMAGE_CAPTION_MODEL for the text provider, which should be a
+        vision-capable model (like ep-20250912105916-n6xlt for Volcengine).
+    """
+    global _vision_ai_service_instance
+
+    if force_new:
+        with _vision_lock:
+            logger.info("Force creating new Vision AIService instance")
+            _vision_ai_service_instance = None
+
+    if _vision_ai_service_instance is None:
+        with _vision_lock:
+            # Double-check locking pattern
+            if _vision_ai_service_instance is None:
+                logger.info("Initializing Vision AIService singleton with provider caching")
+
+                # Get model names from Flask config or use defaults
+                from config import get_config
+                config = get_config()
+
+                if has_app_context() and current_app and hasattr(current_app, "config"):
+                    # Use IMAGE_CAPTION_MODEL for vision tasks
+                    vision_model = current_app.config.get("IMAGE_CAPTION_MODEL", config.IMAGE_CAPTION_MODEL)
+                    # Fall back to TEXT_MODEL if IMAGE_CAPTION_MODEL is not set
+                    if vision_model == config.IMAGE_CAPTION_MODEL:  # using default
+                        vision_model = current_app.config.get("TEXT_MODEL", config.TEXT_MODEL)
+                else:
+                    vision_model = config.IMAGE_CAPTION_MODEL if config.IMAGE_CAPTION_MODEL else config.TEXT_MODEL
+
+                # Get cached text provider for vision model
+                vision_provider = _get_cached_text_provider(vision_model)
+
+                # Create AIService with vision provider (reuse image provider)
+                image_provider = _get_cached_image_provider(config.IMAGE_MODEL)
+
+                # Create Vision AIService
+                _vision_ai_service_instance = AIService(
+                    text_provider=vision_provider,
+                    image_provider=image_provider
+                )
+
+                logger.info(f"Vision AIService singleton created with vision model: {vision_model}")
+
+    return _vision_ai_service_instance
 
 
 def clear_ai_service_cache():
@@ -146,15 +217,20 @@ def clear_ai_service_cache():
     - Prevents race conditions where new instances could be created
       with stale cached providers during the clearing process
     """
-    global _ai_service_instance
-    
+    global _ai_service_instance, _vision_ai_service_instance
+
     with _lock:
         _ai_service_instance = None
         logger.info("AIService singleton cache cleared")
-        with _cache_lock:
-            _text_provider_cache.clear()
-            _image_provider_cache.clear()
-            logger.info("Provider cache cleared")
+
+    with _vision_lock:
+        _vision_ai_service_instance = None
+        logger.info("Vision AIService singleton cache cleared")
+
+    with _cache_lock:
+        _text_provider_cache.clear()
+        _image_provider_cache.clear()
+        logger.info("Provider cache cleared")
 
 
 def get_provider_cache_info() -> dict:

@@ -46,7 +46,7 @@ class Config:
     GOOGLE_API_BASE = os.getenv('GOOGLE_API_BASE', '')
     
     # AI Provider 格式配置: "gemini" (Google GenAI SDK), "openai" (OpenAI SDK), "vertex" (Vertex AI), "volcengine" (火山引擎方舟)
-    AI_PROVIDER_FORMAT = os.getenv('AI_PROVIDER_FORMAT', 'gemini')
+    AI_PROVIDER_FORMAT = os.getenv('AI_PROVIDER_FORMAT', 'volcengine')
 
     # Vertex AI 专用配置（当 AI_PROVIDER_FORMAT=vertex 时使用）
     VERTEX_PROJECT_ID = os.getenv('VERTEX_PROJECT_ID', '')
@@ -68,16 +68,16 @@ class Config:
     ARK_TIMEOUT = float(os.getenv('ARK_TIMEOUT', '300.0'))
     ARK_MAX_RETRIES = int(os.getenv('ARK_MAX_RETRIES', '2'))
     
-    # AI 模型配置
-    TEXT_MODEL = os.getenv('TEXT_MODEL', 'gemini-3-flash-preview')
-    IMAGE_MODEL = os.getenv('IMAGE_MODEL', 'gemini-3-pro-image-preview')
+    # AI 模型配置 - 默认使用火山引擎模型
+    TEXT_MODEL = os.getenv('TEXT_MODEL', 'ep-20251218111535-cwh2f')
+    IMAGE_MODEL = os.getenv('IMAGE_MODEL', 'ep-20251204072545-8d7hn')
 
     # MinerU 文件解析服务配置
     MINERU_TOKEN = os.getenv('MINERU_TOKEN', '')
     MINERU_API_BASE = os.getenv('MINERU_API_BASE', 'https://mineru.net')
     
-    # 图片识别模型配置
-    IMAGE_CAPTION_MODEL = os.getenv('IMAGE_CAPTION_MODEL', 'gemini-3-flash-preview')
+    # 图片识别模型配置 - 默认使用火山引擎视觉模型
+    IMAGE_CAPTION_MODEL = os.getenv('IMAGE_CAPTION_MODEL', 'ep-20250912105916-n6xlt')
     
     # 并发配置
     MAX_DESCRIPTION_WORKERS = int(os.getenv('MAX_DESCRIPTION_WORKERS', '5'))
@@ -104,9 +104,9 @@ class Config:
     VOLCENGINE_INPAINTING_MAX_RETRIES = int(os.getenv('VOLCENGINE_INPAINTING_MAX_RETRIES', '3'))  # 最大重试次数
 
     # Inpainting Provider 配置（用于 InpaintingService 的单张图片修复）
-    # 可选值: 'volcengine' (火山引擎), 'gemini' (Google Gemini)
+    # 可选值: 'volcengine_ark' (火山引擎方舟，推荐), 'volcengine' (火山引擎视觉), 'gemini' (Google Gemini)
     # 注意: 可编辑PPTX导出功能使用 ImageEditabilityService，其中 HybridInpaintProvider 会结合百度重绘和生成式质量增强
-    INPAINTING_PROVIDER = os.getenv('INPAINTING_PROVIDER', 'gemini')  # 默认使用 Gemini
+    INPAINTING_PROVIDER = os.getenv('INPAINTING_PROVIDER', 'volcengine_ark')  # 默认使用火山引擎方舟
     
     # 百度 API 配置（用于 OCR 和图像修复）
     BAIDU_OCR_API_KEY = os.getenv('BAIDU_OCR_API_KEY', '')

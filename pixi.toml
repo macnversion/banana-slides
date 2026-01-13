@@ -1,0 +1,63 @@
+[project]
+name = "banana-slides"
+version = "0.3.0"
+description = "Banana Slides – AI native PPT generator"
+authors = ["Anionex"]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[activation]
+scripts = ["activate.sh"]
+
+[dependencies]
+python = ">=3.10"
+# Flask 框架
+flask = ">=3.0.0"
+flask-cors = ">=4.0.0"
+flask-sqlalchemy = ">=3.1.1"
+werkzeug = ">=3.0.1"
+# 数据库迁移
+alembic = ">=1.13.0"
+# 数据处理
+pydantic = ">=2.9.0"
+pillow = ">=12.0.0"
+python-dotenv = ">=1.0.1"
+tenacity = ">=9.0.0"
+# 文档处理
+python-pptx = ">=1.0.0"
+reportlab = ">=4.1.0"
+img2pdf = ">=0.5.1"
+# PDF/图片转换
+pdf2image = ">=1.16.0"
+poppler = "*"  # pdf2image 需要
+# 测试工具
+pytest = ">=7.4.0"
+pytest-mock = ">=3.12.0"
+pytest-cov = ">=4.1.0"
+pytest-asyncio = ">=0.21.0"
+httpx = ">=0.25.0"
+flake8 = ">=6.1.0"
+black = ">=23.0.0"
+
+[pypi-dependencies]
+# PyPI 包（conda-forge 中不可用的包）
+flask-migrate = ">=4.0.0"
+google-genai = ">=1.52.0"
+openai = ">=1.0.0"
+volcengine-python-sdk = { version = ">=1.0.0", extras = ["ark"] }
+markitdown = { version = "*", extras = ["all"] }
+python-docx = ">=1.0.0"
+
+[tasks]
+# 数据库迁移和启动
+migrate = "cd backend && pixi run alembic upgrade head"
+dev = { cmd = "cd backend && pixi run python app.py", depends_on = ["migrate"] }
+start = "pixi run dev"
+
+# 测试
+test = "cd backend && pixi run pytest"
+test-cov = "cd backend && pixi run pytest --cov=."
+
+# 代码质量
+format = "pixi run black backend/"
+lint = "pixi run flake8 backend/"
