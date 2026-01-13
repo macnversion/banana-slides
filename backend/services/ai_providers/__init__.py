@@ -10,7 +10,7 @@ Configuration Priority (highest to lowest):
     3. Default values
 
 Environment Variables:
-    AI_PROVIDER_FORMAT: "gemini" (default), "openai", or "vertex"
+    AI_PROVIDER_FORMAT: "gemini" (default), "openai", "vertex", or "volcengine"
 
     For Gemini format (Google GenAI SDK):
         GOOGLE_API_KEY: API key
@@ -24,19 +24,23 @@ Environment Variables:
         VERTEX_PROJECT_ID: GCP project ID
         VERTEX_LOCATION: GCP region (default: us-central1)
         GOOGLE_APPLICATION_CREDENTIALS: Path to service account JSON file
+    
+    For Volcengine format (火山引擎方舟):
+        ARK_API_KEY: 火山方舟 API Key
+        ARK_API_BASE: API base URL (default: https://ark.cn-beijing.volces.com/api/v3)
 """
 import os
 import logging
 from typing import Dict, Any
 
-from .text import TextProvider, GenAITextProvider, OpenAITextProvider
-from .image import ImageProvider, GenAIImageProvider, OpenAIImageProvider
+from .text import TextProvider, GenAITextProvider, OpenAITextProvider, VolcengineTextProvider
+from .image import ImageProvider, GenAIImageProvider, OpenAIImageProvider, VolcengineImageProvider
 
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    'TextProvider', 'GenAITextProvider', 'OpenAITextProvider',
-    'ImageProvider', 'GenAIImageProvider', 'OpenAIImageProvider',
+    'TextProvider', 'GenAITextProvider', 'OpenAITextProvider', 'VolcengineTextProvider',
+    'ImageProvider', 'GenAIImageProvider', 'OpenAIImageProvider', 'VolcengineImageProvider',
     'get_text_provider', 'get_image_provider', 'get_provider_format'
 ]
 
@@ -51,7 +55,7 @@ def get_provider_format() -> str:
         3. Default: 'gemini'
 
     Returns:
-        "gemini", "openai", or "vertex"
+        "gemini", "openai", "vertex", or "volcengine"
     """
     # Try to get from Flask app config first (database settings)
     try:
@@ -139,6 +143,24 @@ def _get_provider_config() -> Dict[str, Any]:
             'location': location,
         }
 
+    elif provider_format == 'volcengine':
+        # 火山引擎方舟格式
+        api_key = _get_config_value('ARK_API_KEY')
+        api_base = _get_config_value('ARK_API_BASE', 'https://ark.cn-beijing.volces.com/api/v3')
+
+        if not api_key:
+            raise ValueError(
+                "ARK_API_KEY (from database settings or environment) is required when AI_PROVIDER_FORMAT=volcengine."
+            )
+
+        logger.info(f"Provider config - format: volcengine, api_base: {api_base}")
+
+        return {
+            'format': 'volcengine',
+            'api_key': api_key,
+            'api_base': api_base,
+        }
+
     elif provider_format == 'openai':
         api_key = _get_config_value('OPENAI_API_KEY') or _get_config_value('GOOGLE_API_KEY')
         api_base = _get_config_value('OPENAI_API_BASE', 'https://aihubmix.com/v1')
@@ -186,7 +208,17 @@ def get_text_provider(model: str = "gemini-3-flash-preview") -> TextProvider:
     config = _get_provider_config()
     provider_format = config['format']
 
-    if provider_format == 'openai':
+    if provider_format == 'volcengine':
+        from config import get_config
+        logger.info(f"Using Volcengine format for text generation, model: {model}")
+        return VolcengineTextProvider(
+            api_key=config['api_key'],
+            api_base=config['api_base'],
+            model=model,
+            timeout=get_config().ARK_TIMEOUT,
+            max_retries=get_config().ARK_MAX_RETRIES
+        )
+    elif provider_format == 'openai':
         logger.info(f"Using OpenAI format for text generation, model: {model}")
         return OpenAITextProvider(api_key=config['api_key'], api_base=config['api_base'], model=model)
     elif provider_format == 'vertex':
@@ -219,7 +251,17 @@ def get_image_provider(model: str = "gemini-3-pro-image-preview") -> ImageProvid
     config = _get_provider_config()
     provider_format = config['format']
 
-    if provider_format == 'openai':
+    if provider_format == 'volcengine':
+        from config import get_config
+        logger.info(f"Using Volcengine format for image generation, model: {model}")
+        return VolcengineImageProvider(
+            api_key=config['api_key'],
+            api_base=config['api_base'],
+            model=model,
+            timeout=get_config().ARK_TIMEOUT,
+            max_retries=get_config().ARK_MAX_RETRIES
+        )
+    elif provider_format == 'openai':
         logger.info(f"Using OpenAI format for image generation, model: {model}")
         logger.warning("OpenAI format only supports 1K resolution, 4K is not available")
         return OpenAIImageProvider(api_key=config['api_key'], api_base=config['api_base'], model=model)

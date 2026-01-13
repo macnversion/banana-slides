@@ -31,7 +31,7 @@ interface SectionConfig {
 
 // 初始表单数据
 const initialFormData = {
-  ai_provider_format: 'gemini' as 'openai' | 'gemini',
+  ai_provider_format: 'gemini' as 'openai' | 'gemini' | 'volcengine',
   api_base_url: '',
   api_key: '',
   text_model: '',
@@ -60,6 +60,7 @@ const settingsSections: SectionConfig[] = [
         options: [
           { value: 'openai', label: 'OpenAI 格式' },
           { value: 'gemini', label: 'Gemini 格式' },
+          { value: 'volcengine', label: '火山引擎' },
         ],
       },
       {
@@ -327,13 +328,14 @@ export const Settings: React.FC = () => {
                 key={option.value}
                 type="button"
                 onClick={() => handleFieldChange(field.key, option.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  value === option.value
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${value === option.value
                     ? option.value === 'openai'
                       ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md'
-                      : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md'
+                      : option.value === 'volcengine'
+                        ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md'
+                        : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md'
                     : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                }`}
+                  }`}
               >
                 {option.label}
               </button>
@@ -383,7 +385,7 @@ export const Settings: React.FC = () => {
           placeholder={placeholder}
           value={value as string | number}
           onChange={(e) => {
-            const newValue = field.type === 'number' 
+            const newValue = field.type === 'number'
               ? parseInt(e.target.value) || (field.min ?? 0)
               : e.target.value;
             handleFieldChange(field.key, newValue);
@@ -469,7 +471,7 @@ export const Settings: React.FC = () => {
 // SettingsPage 组件 - 完整页面包装
 export const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-banana-50 to-yellow-50">
       <div className="container mx-auto px-4 py-8 max-w-4xl">

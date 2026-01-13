@@ -45,7 +45,7 @@ class Config:
     GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', '')
     GOOGLE_API_BASE = os.getenv('GOOGLE_API_BASE', '')
     
-    # AI Provider 格式配置: "gemini" (Google GenAI SDK), "openai" (OpenAI SDK), "vertex" (Vertex AI)
+    # AI Provider 格式配置: "gemini" (Google GenAI SDK), "openai" (OpenAI SDK), "vertex" (Vertex AI), "volcengine" (火山引擎方舟)
     AI_PROVIDER_FORMAT = os.getenv('AI_PROVIDER_FORMAT', 'gemini')
 
     # Vertex AI 专用配置（当 AI_PROVIDER_FORMAT=vertex 时使用）
@@ -61,6 +61,12 @@ class Config:
     OPENAI_API_BASE = os.getenv('OPENAI_API_BASE', 'https://aihubmix.com/v1')
     OPENAI_TIMEOUT = float(os.getenv('OPENAI_TIMEOUT', '300.0'))  # 增加到 5 分钟（生成清洁背景图需要很长时间）
     OPENAI_MAX_RETRIES = int(os.getenv('OPENAI_MAX_RETRIES', '2'))  # 减少重试次数，避免过多重试导致累积超时
+    
+    # 火山引擎方舟 API 配置（当 AI_PROVIDER_FORMAT=volcengine 时使用）
+    ARK_API_KEY = os.getenv('ARK_API_KEY', '')
+    ARK_API_BASE = os.getenv('ARK_API_BASE', 'https://ark.cn-beijing.volces.com/api/v3')
+    ARK_TIMEOUT = float(os.getenv('ARK_TIMEOUT', '300.0'))
+    ARK_MAX_RETRIES = int(os.getenv('ARK_MAX_RETRIES', '2'))
     
     # AI 模型配置
     TEXT_MODEL = os.getenv('TEXT_MODEL', 'gemini-3-flash-preview')

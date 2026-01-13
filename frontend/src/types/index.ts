@@ -11,17 +11,17 @@ export interface OutlineContent {
 }
 
 // 描述内容 - 支持两种格式：后端可能返回纯文本或结构化内容
-export type DescriptionContent = 
+export type DescriptionContent =
   | {
-      // 格式1: 后端返回的纯文本格式
-      text: string;
-    }
+    // 格式1: 后端返回的纯文本格式
+    text: string;
+  }
   | {
-      // 格式2: 类型定义中的结构化格式
-      title: string;
-      text_content: string[];
-      layout_suggestion?: string;
-    };
+    // 格式2: 类型定义中的结构化格式
+    title: string;
+    text_content: string[];
+    layout_suggestion?: string;
+  };
 
 // 图片版本
 export interface ImageVersion {
@@ -120,7 +120,7 @@ export interface ApiResponse<T = any> {
 // 设置
 export interface Settings {
   id: number;
-  ai_provider_format: 'openai' | 'gemini';
+  ai_provider_format: 'openai' | 'gemini' | 'volcengine';
   api_base_url?: string;
   api_key_length: number;
   image_resolution: string;
