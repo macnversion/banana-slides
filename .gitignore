@@ -33,9 +33,9 @@
 !template*.png
 
 # 忽略临时文档，但保留项目文档
-*.md
+.md
+!docs/**/*.md
 !README.md
-# !docs/**/*.md
 !.github/**/*.md
 *.pyc
 .env
