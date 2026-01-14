@@ -15,24 +15,24 @@
 
 Example:
     >>> from services.image_editability import ServiceConfig, ImageEditabilityService
-    >>> 
+    >>>
     >>> # 创建配置
-    >>> config = ServiceConfig.from_defaults(mineru_token="your_token")
-    >>> 
+    >>> config = ServiceConfig.from_defaults(ai_service=ai_service)
+    >>>
     >>> # 创建服务
     >>> service = ImageEditabilityService(config)
-    >>> 
+    >>>
     >>> # 串行处理
     >>> result = service.make_image_editable("image.png")
-    >>> 
+    >>>
     >>> # 并行处理（推荐）
     >>> from concurrent.futures import ThreadPoolExecutor, as_completed
-    >>> 
+    >>>
     >>> images = ["img1.png", "img2.png", "img3.png"]
     >>> with ThreadPoolExecutor(max_workers=4) as executor:
-    ...     futures = {executor.submit(service.make_image_editable, img): img 
+    ...     futures = {executor.submit(service.make_image_editable, img): img
     ...                for img in images}
-    ...     results = {images[i]: future.result() 
+    ...     results = {images[i]: future.result()
     ...                for i, future in enumerate(as_completed(futures))}
 """
 
@@ -46,12 +46,13 @@ from .coordinate_mapper import CoordinateMapper
 from .extractors import (
     ElementExtractor,
     MinerUElementExtractor,
-    BaiduOCRElementExtractor,
-    BaiduAccurateOCRElementExtractor,
     ExtractorRegistry
 )
 
-# 混合提取器
+# 视觉模型提取器
+from .vision_extractor import VisionElementExtractor
+
+# 已弃用的混合提取器（保留用于向后兼容）
 from .hybrid_extractor import (
     HybridElementExtractor,
     BBoxUtils,
@@ -63,8 +64,9 @@ from .inpaint_providers import (
     InpaintProvider,
     DefaultInpaintProvider,
     GenerativeEditInpaintProvider,
-    BaiduInpaintProvider,
-    HybridInpaintProvider,
+    # 已弃用的百度Inpaint提供者（保留用于向后兼容）
+    # BaiduInpaintProvider,
+    # HybridInpaintProvider,
     InpaintProviderRegistry
 )
 
@@ -97,10 +99,10 @@ __all__ = [
     # 元素提取器
     'ElementExtractor',
     'MinerUElementExtractor',
-    'BaiduOCRElementExtractor',
-    'BaiduAccurateOCRElementExtractor',
     'ExtractorRegistry',
-    # 混合提取器
+    # 视觉模型提取器
+    'VisionElementExtractor',
+    # 已弃用的混合提取器（保留用于向后兼容）
     'HybridElementExtractor',
     'BBoxUtils',
     'create_hybrid_extractor',
@@ -108,9 +110,10 @@ __all__ = [
     'InpaintProvider',
     'DefaultInpaintProvider',
     'GenerativeEditInpaintProvider',
-    'BaiduInpaintProvider',
-    'HybridInpaintProvider',
     'InpaintProviderRegistry',
+    # 已弃用的百度Inpaint提供者（保留用于向后兼容）
+    # 'BaiduInpaintProvider',
+    # 'HybridInpaintProvider',
     # 文字属性提取器
     'TextStyleResult',
     'TextAttributeExtractor',
@@ -124,4 +127,3 @@ __all__ = [
     # 主服务
     'ImageEditabilityService',
 ]
-

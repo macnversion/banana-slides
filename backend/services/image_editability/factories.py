@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .extractors import ElementExtractor, MinerUElementExtractor, BaiduOCRElementExtractor, BaiduAccurateOCRElementExtractor, ExtractorRegistry
 from .hybrid_extractor import HybridElementExtractor, create_hybrid_extractor
+from .vision_extractor import VisionElementExtractor
 from .inpaint_providers import (
     InpaintProvider, 
     DefaultInpaintProvider, 
@@ -198,6 +199,29 @@ class ExtractorFactory:
         if baidu_ocr_extractor is None:
             logger.warning("无法创建百度高精度OCR提取器，混合提取器创建失败")
             return None
+
+    @staticmethod
+    def create_vision_extractor_registry(ai_service) -> ExtractorRegistry:
+        """
+        创建基于视觉模型的元素提取器注册表
+
+        使用火山引擎视觉模型的OCR能力，替代 MinerU + 百度OCR
+
+        Args:
+            ai_service: AIService实例（需要支持 generate_json_with_image）
+
+        Returns:
+            配置好的ExtractorRegistry实例
+        """
+        # 创建视觉模型提取器
+        vision_extractor = VisionElementExtractor(ai_service)
+        logger.info("✅ 视觉模型提取器已创建")
+
+        # 创建注册表，视觉模型作为默认提取器
+        registry = ExtractorRegistry()
+        registry.register_default(vision_extractor)
+
+        return registry
         
         logger.info("✅ 百度高精度OCR提取器已创建（用于混合提取）")
         
@@ -493,16 +517,22 @@ class ServiceConfig:
         ai_service: Optional[Any] = None,
         use_hybrid_extractor: bool = True,
         use_hybrid_inpaint: bool = True,
-        extractor_method: Optional[str] = None,  # 'mineru' 或 'hybrid'，优先于 use_hybrid_extractor
+        use_vision_extractor: bool = False,  # 新增：是否使用视觉模型提取器
+        extractor_method: Optional[str] = None,  # 'mineru', 'hybrid', 'vision'，优先于 use_hybrid_extractor
         inpaint_method: Optional[str] = None,    # 'generative', 'baidu', 'hybrid'，优先于 use_hybrid_inpaint
         **kwargs
     ) -> 'ServiceConfig':
         """
         从默认参数创建配置
-        
+
         默认配置（推荐用于导出PPTX）：
         - 元素提取：混合提取器（MinerU版面分析 + 百度高精度OCR）
         - 背景生成：混合Inpaint（百度图像修复 + 生成式画质提升）
+        - 递归深度：1
+
+        火山引擎视觉模式：
+        - 元素提取：视觉模型提取器（火山引擎视觉OCR能力）
+        - 背景生成：火山引擎Inpainting + 生成式画质提升
         - 递归深度：1
         
         混合提取器合并策略：
@@ -543,8 +573,9 @@ class ServiceConfig:
         """
         # 处理新参数：extractor_method 优先于 use_hybrid_extractor
         if extractor_method is not None:
+            use_vision_extractor = (extractor_method == 'vision')
             use_hybrid_extractor = (extractor_method == 'hybrid')
-            logger.info(f"extractor_method={extractor_method} -> use_hybrid_extractor={use_hybrid_extractor}")
+            logger.info(f"extractor_method={extractor_method} -> use_vision_extractor={use_vision_extractor}, use_hybrid_extractor={use_hybrid_extractor}")
         # 自动从 Flask config 获取配置
         from flask import current_app, has_app_context
         
@@ -577,38 +608,64 @@ class ServiceConfig:
             upload_path = project_root / upload_folder.lstrip('./')
         
         logger.info(f"Upload folder resolved to: {upload_path}")
-        
-        # 创建MinerU解析服务
-        parser_service = FileParserService(
-            mineru_token=mineru_token,
-            mineru_api_base=mineru_api_base
-        )
-        
+
         # 创建提取器注册表
         extractor_registry = ExtractorRegistry()
-        
-        if use_hybrid_extractor:
-            # 尝试创建混合提取器（MinerU + 百度高精度OCR）
-            hybrid_extractor = ExtractorFactory.create_hybrid_extractor(
-                parser_service=parser_service,
-                upload_folder=upload_path,
-                contain_threshold=kwargs.get('contain_threshold', 0.8),
-                intersection_threshold=kwargs.get('intersection_threshold', 0.3)
+
+        # 根据extractor_method选择提取器类型
+        if use_vision_extractor:
+            # 使用视觉模型提取器（火山引擎）
+            if ai_service is None:
+                raise ValueError("Vision extractor requires ai_service parameter")
+
+            vision_extractor = ExtractorFactory.create_vision_extractor_registry(ai_service)
+            extractor_registry = vision_extractor
+            logger.info("✅ 视觉模型提取器已启用（火山引擎）")
+        else:
+            # 使用MinerU + 百度OCR（需要MinerU配置）
+            if not mineru_token:
+                raise ValueError("MinerU token is required. Please configure MINERU_TOKEN.")
+
+            from services.file_parser_service import FileParserService
+
+            # 创建MinerU解析服务
+            parser_service = FileParserService(
+                mineru_token=mineru_token,
+                mineru_api_base=mineru_api_base
             )
-            
-            if hybrid_extractor:
-                extractor_registry.register_default(hybrid_extractor)
-                logger.info("✅ 混合提取器已创建（MinerU + 百度高精度OCR）")
+
+            # 解析upload_folder路径
+            upload_path = Path(upload_folder)
+            if not upload_path.is_absolute():
+                current_file = Path(__file__).resolve()
+                backend_dir = current_file.parent.parent
+                project_root = backend_dir.parent
+                upload_path = project_root / upload_folder.lstrip('./')
+
+            logger.info(f"Upload folder resolved to: {upload_path}")
+
+            if use_hybrid_extractor:
+                # 尝试创建混合提取器（MinerU + 百度高精度OCR）
+                hybrid_extractor = ExtractorFactory.create_hybrid_extractor(
+                    parser_service=parser_service,
+                    upload_folder=upload_path,
+                    contain_threshold=kwargs.get('contain_threshold', 0.8),
+                    intersection_threshold=kwargs.get('intersection_threshold', 0.3)
+                )
+
+                if hybrid_extractor:
+                    extractor_registry.register_default(hybrid_extractor)
+                    logger.info("✅ 混合提取器已创建（MinerU + 百度高精度OCR）")
+                else:
+                    # 回退到MinerU
+                    mineru_extractor = MinerUElementExtractor(parser_service, upload_path)
+                    extractor_registry.register_default(mineru_extractor)
+                    logger.warning("⚠️ 混合提取器创建失败，回退到MinerU提取器")
             else:
-                # 回退到MinerU
+                # 使用纯MinerU提取器
                 mineru_extractor = MinerUElementExtractor(parser_service, upload_path)
                 extractor_registry.register_default(mineru_extractor)
-                logger.warning("⚠️ 混合提取器创建失败，回退到MinerU提取器")
-        else:
-            # 使用纯MinerU提取器
-            mineru_extractor = MinerUElementExtractor(parser_service, upload_path)
-            extractor_registry.register_default(mineru_extractor)
-            logger.info("✅ MinerU提取器已创建（通用分割）")
+                logger.info("✅ MinerU提取器已创建（通用分割）")
         
         # 创建Inpaint提供者
         inpaint_registry = InpaintProviderRegistry()

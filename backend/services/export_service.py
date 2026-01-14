@@ -942,8 +942,8 @@ class ExportService:
         editable_images: List = None,  # 可选：直接传入已分析的EditableImage列表
         text_attribute_extractor = None,  # 可选：文字属性提取器，用于提取颜色、粗体、斜体等样式
         progress_callback = None,  # 可选：进度回调函数 (step, message, percent) -> None
-        export_extractor_method: str = 'hybrid',  # 组件提取方法: mineru, hybrid
-        export_inpaint_method: str = 'hybrid'  # 背景修复方法: generative, baidu, hybrid
+        export_extractor_method: str = 'vision',  # 组件提取方法: vision(火山引擎), mineru, hybrid
+        export_inpaint_method: str = 'generative'  # 背景修复方法: generative, baidu, hybrid（默认使用纯生成式，不依赖百度）
     ) -> Tuple[Optional[bytes], ExportWarnings]:
         """
         使用递归图片可编辑化服务创建可编辑PPTX
@@ -1003,7 +1003,13 @@ class ExportService:
             
             # 1. 创建ImageEditabilityService（配置自动从 Flask config 获取，使用项目导出设置）
             logger.info(f"使用导出设置: extractor={export_extractor_method}, inpaint={export_inpaint_method}")
+
+            # 获取ai_service（用于视觉模型提取器）
+            from services.ai_service_manager import get_vision_ai_service
+            ai_service = get_vision_ai_service()
+
             config = ServiceConfig.from_defaults(
+                ai_service=ai_service,
                 max_depth=max_depth,
                 extractor_method=export_extractor_method,
                 inpaint_method=export_inpaint_method

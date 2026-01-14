@@ -3,9 +3,8 @@
 
 包含：
 - ElementExtractor: 提取器抽象接口
-- MinerUElementExtractor: MinerU版面分析提取器
-- BaiduOCRElementExtractor: 百度表格OCR提取器
-- BaiduAccurateOCRElementExtractor: 百度高精度OCR提取器（文字识别）
+- MinerUElementExtractor: MinerU版面分析提取器（已弃用，保留用于向后兼容）
+- VisionElementExtractor: 基于火山引擎视觉模型的提取器（推荐）
 - ExtractorRegistry: 元素类型到提取器的映射注册表
 """
 import os

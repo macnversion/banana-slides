@@ -2,6 +2,7 @@
 Reference File Controller - handles file upload and parsing
 """
 import os
+import json
 import logging
 import re
 import uuid
@@ -15,7 +16,7 @@ import threading
 
 from models import db, ReferenceFile, Project
 from utils.response import success_response, error_response, bad_request, not_found
-from services.file_parser_service import FileParserService
+from services.vision_file_parser_service import create_vision_file_parser
 
 logger = logging.getLogger(__name__)
 
@@ -56,39 +57,35 @@ def _parse_file_async(file_id: str, file_path: str, filename: str, app):
             reference_file.parse_status = 'parsing'
             db.session.commit()
             
-            # Initialize parser service
-            parser = FileParserService(
-                mineru_token=current_app.config['MINERU_TOKEN'],
-                mineru_api_base=current_app.config['MINERU_API_BASE'],
-                google_api_key=current_app.config.get('GOOGLE_API_KEY', ''),
-                google_api_base=current_app.config.get('GOOGLE_API_BASE', ''),
-                openai_api_key=current_app.config.get('OPENAI_API_KEY', ''),
-                openai_api_base=current_app.config.get('OPENAI_API_BASE', ''),
-                image_caption_model=current_app.config['IMAGE_CAPTION_MODEL'],
-                provider_format=current_app.config.get('AI_PROVIDER_FORMAT', 'gemini')
-            )
+            # Initialize parser service (使用视觉模型替代MinerU)
+            parser = create_vision_file_parser()
             
-            # Parse file
+            # Parse file (视觉模型返回: content, pages, images, total_pages)
             logger.info(f"Starting to parse file: {filename}")
-            batch_id, markdown_content, extract_id, error_message, failed_image_count = parser.parse_file(file_path, filename)
-            
+            result = parser.parse_file(file_path)
+
+            error_message = result.get('error')
+            content = result.get('content', '')
+            pages_data = result.get('pages', [])
+            images_data = result.get('images', [])
+
             # Update database
-            reference_file.mineru_batch_id = batch_id
+            # 注意：视觉模型不返回batch_id，mineru_batch_id设为None
             if error_message:
                 reference_file.parse_status = 'failed'
                 reference_file.error_message = error_message
                 logger.error(f"File parsing failed: {error_message}")
             else:
                 reference_file.parse_status = 'completed'
-                reference_file.markdown_content = markdown_content
-                if failed_image_count > 0:
-                    logger.warning(f"File parsing completed: {filename}, but {failed_image_count} images failed to generate captions")
-                else:
-                    logger.info(f"File parsing completed: {filename}")
-            
+                reference_file.parsed_content = content
+                reference_file.parsed_pages = json.dumps(pages_data)
+                reference_file.parsed_images = json.dumps(images_data) if images_data else None
+                logger.info(f"File parsed successfully: {len(pages_data)} pages, {len(images_data)} images")
+                reference_file.mineru_batch_id = None
+
             reference_file.updated_at = datetime.utcnow()
             db.session.commit()
-            
+
         except Exception as e:
             logger.error(f"Error in async file parsing: {str(e)}", exc_info=True)
             try:
