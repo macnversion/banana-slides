@@ -15,24 +15,22 @@ if [ ! -f .env ]; then
     echo ""
 fi
 
-# Check if virtual environment exists
-if [ ! -d "venv" ]; then
-    echo "📦 Creating virtual environment..."
-    python3 -m venv venv
-    echo "✅ Virtual environment created."
+# Check if pixi is installed
+if ! command -v pixi &> /dev/null; then
+    echo "❌ Pixi is not installed."
+    echo "📦 Please install Pixi first:"
+    echo "   curl -fsSL https://pixi.sh/install.sh | bash"
     echo ""
+    exit 1
 fi
 
-# Activate virtual environment
-echo "🔄 Activating virtual environment..."
-source venv/bin/activate
-
-# Install dependencies
-echo "📥 Installing dependencies..."
-pip install -r requirements.txt
+# Install dependencies using Pixi (run from project root)
+echo "📥 Installing dependencies with Pixi..."
+cd "$(dirname "$0")/.." || exit 1
+pixi install
 
 # Create instance folder if not exists
-mkdir -p instance
+mkdir -p backend/instance
 mkdir -p uploads
 
 echo ""
@@ -41,6 +39,6 @@ echo ""
 echo "🚀 Starting server..."
 echo ""
 
-# Run the application
-python app.py
-
+# Run database migrations and start the application
+cd backend || exit 1
+pixi run alembic upgrade head && pixi run python app.py

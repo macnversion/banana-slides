@@ -69,7 +69,7 @@ def get_provider_format() -> str:
         pass
     
     # Fallback to environment variable
-    return os.getenv('AI_PROVIDER_FORMAT', 'gemini').lower()
+    return os.getenv('AI_PROVIDER_FORMAT', 'volcengine').lower()
 
 
 def _get_config_value(key: str, default: str = None) -> str:

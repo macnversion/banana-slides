@@ -85,25 +85,25 @@ if [ "$TEST_MODE" = "full" ]; then
     
     # 4. Backend unit tests
     log_info "Step 4: Backend unit tests..."
-    if command -v uv &> /dev/null; then
-        uv sync --extra test 2>/dev/null || log_warning "Dependency sync failed, continuing..."
+    if command -v pixi &> /dev/null; then
+        pixi install 2>/dev/null || log_warning "Dependency sync failed, continuing..."
         cd backend
-        uv run pytest tests/unit -v || {
+        pixi run pytest tests/unit -v || {
             log_error "Backend unit tests failed"
             exit 1
         }
         cd ..
         log_success "Backend unit tests passed"
     else
-        log_warning "uv not installed, skipping backend unit tests"
-        log_info "  Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+        log_warning "pixi not installed, skipping backend unit tests"
+        log_info "  Install: curl -fsSL https://pixi.sh/install.sh | bash"
     fi
     
     # 5. Backend integration tests
     log_info "Step 5: Backend integration tests..."
-    if command -v uv &> /dev/null; then
+    if command -v pixi &> /dev/null; then
         cd backend
-        TESTING=true uv run pytest tests/integration -v || {
+        TESTING=true pixi run pytest tests/integration -v || {
             log_error "Backend integration tests failed"
             exit 1
         }

@@ -44,7 +44,7 @@ def _get_ai_provider_format(provider_format: str = None) -> str:
         pass
     
     # Fallback to environment variable
-    return os.getenv('AI_PROVIDER_FORMAT', 'gemini').lower()
+    return os.getenv('AI_PROVIDER_FORMAT', 'volcengine').lower()
 
 
 class FileParserService:

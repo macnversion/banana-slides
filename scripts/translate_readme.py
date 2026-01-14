@@ -101,7 +101,7 @@ def translate_readme(source_file: str, target_file: str):
         
     except ImportError as e:
         logger.error(f"导入错误: {e}")
-        logger.error("请确保已安装所有依赖: uv sync")
+        logger.error("请确保已安装所有依赖: pixi install")
         sys.exit(1)
     except FileNotFoundError as e:
         logger.error(f"文件不存在: {e}")

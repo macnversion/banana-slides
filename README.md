@@ -307,7 +307,7 @@ docker compose up -d
 
 #### 环境要求
 - Python 3.10 或更高版本
-- [uv](https://github.com/astral-sh/uv) - Python 包管理器
+- [Pixi](https://pixi.sh) - Python 包管理器
 - Node.js 16+ 和 npm
 - 有效的 Google Gemini API 密钥
 
@@ -319,19 +319,19 @@ git clone https://github.com/Anionex/banana-slides
 cd banana-slides
 ```
 
-1. **安装 uv（如果尚未安装）**
+1. **安装 Pixi（如果尚未安装）**
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://pixi.sh/install.sh | bash
 ```
 
 2. **安装依赖**
 
 在项目根目录下运行：
 ```bash
-uv sync
+pixi install
 ```
 
-这将根据 `pyproject.toml` 自动安装所有依赖。
+这将根据 `pixi.toml` 自动安装所有依赖。
 
 3. **配置环境变量**
 
@@ -389,7 +389,7 @@ npm install
 
 ```bash
 cd backend
-uv run alembic upgrade head && uv run python app.py
+pixi run alembic upgrade head && pixi run python app.py
 ```
 
 后端服务将在 `http://localhost:5000` 启动。
@@ -423,7 +423,7 @@ npm run dev
 ### 后端技术栈
 - **语言**：Python 3.10+
 - **框架**：Flask 3.0
-- **包管理**：uv
+- **包管理**：Pixi
 - **数据库**：SQLite + Flask-SQLAlchemy
 - **AI能力**：Google Gemini API
 - **PPT处理**：python-pptx
@@ -520,8 +520,9 @@ banana-slides/
 ├── v0_demo/                    # 早期演示版本
 ├── output/                     # 输出文件目录
 │
-├── pyproject.toml              # Python项目配置（uv管理）
-├── uv.lock                     # uv依赖锁定文件
+├── pyproject.toml              # Python项目配置（pytest配置）
+├── pixi.toml                   # Pixi依赖管理配置
+├── pixi.lock                   # Pixi依赖锁定文件
 ├── docker-compose.yml          # Docker Compose配置
 ├── .env.example                 # 环境变量示例
 ├── LICENSE                     # 许可证

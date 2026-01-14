@@ -10,7 +10,8 @@ class Settings(db.Model):
     __tablename__ = 'settings'
 
     id = db.Column(db.Integer, primary_key=True, default=1)
-    ai_provider_format = db.Column(db.String(20), nullable=False, default='gemini')  # AI提供商格式: openai, gemini
+    # 注意: SQLAlchemy default='gemini' 仅为回退值，实际默认值由 get_settings() 从 Config.AI_PROVIDER_FORMAT 获取
+    ai_provider_format = db.Column(db.String(20), nullable=False, default='gemini')  # AI提供商格式: openai, gemini, volcengine
     api_base_url = db.Column(db.String(500), nullable=True)  # API基础URL
     api_key = db.Column(db.String(500), nullable=True)  # API密钥
     image_resolution = db.Column(db.String(20), nullable=False, default='2K')  # 图像清晰度: 1K, 2K, 4K

@@ -9,7 +9,7 @@
 - **AI服务**: Google Gemini API
 - **PPT处理**: python-pptx
 - **并发处理**: ThreadPoolExecutor
-- **包管理**: uv
+- **包管理**: Pixi
 
 ## 项目结构
 
@@ -49,11 +49,11 @@ backend/
 
 ### 1. 安装依赖
 
-本项目使用 [uv](https://github.com/astral-sh/uv) 管理 Python 依赖。所有依赖定义在项目根目录的 `pyproject.toml` 文件中。
+本项目使用 [Pixi](https://pixi.sh) 管理 Python 依赖。所有依赖定义在项目根目录的 `pixi.toml` 文件中。
 
 在项目根目录下运行：
 ```bash
-uv sync
+pixi install
 ```
 
 这将自动安装所有必需的依赖包。
@@ -85,7 +85,7 @@ VOLCENGINE_INPAINTING_MAX_RETRIES=3
 
 ```bash
 cd backend
-uv run alembic upgrade head
+pixi run alembic upgrade head
 ```
 
 > 注意：  
@@ -94,10 +94,10 @@ uv run alembic upgrade head
 
 ### 4. 运行服务
 
-使用 uv 运行：
+使用 Pixi 运行：
 ```bash
 cd backend
-uv run python app.py
+pixi run python app.py
 ```
 服务将在 `http://localhost:5000` 启动。
 

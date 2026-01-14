@@ -195,7 +195,7 @@ E2E tests require a real Google API key to test the complete AI generation workf
 1. **日常开发**：运行单元测试和集成测试
    ```bash
    # 后端
-   cd backend && uv run pytest tests/
+   cd backend && pixi run pytest tests/
    
    # 前端
    cd frontend && npm test

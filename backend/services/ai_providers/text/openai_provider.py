@@ -47,3 +47,50 @@ class OpenAITextProvider(TextProvider):
             ]
         )
         return response.choices[0].message.content
+
+    def generate_with_image(self, prompt: str, image_path: str, thinking_budget: int = 1000) -> str:
+        """
+        Generate text with image input (multimodal)
+
+        Args:
+            prompt: The input prompt
+            image_path: Path to the image file
+            thinking_budget: Thinking budget (not used, kept for interface compatibility)
+
+        Returns:
+            Generated text
+        """
+        import base64
+        from PIL import Image
+        from io import BytesIO
+
+        # 加载并编码图片
+        img = Image.open(image_path)
+        buffered = BytesIO()
+        if img.mode in ('RGBA', 'LA', 'P'):
+            img = img.convert('RGB')
+        img.save(buffered, format="JPEG", quality=85)
+        image_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+        # 构建多模态请求
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}"
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        )
+        return response.choices[0].message.content

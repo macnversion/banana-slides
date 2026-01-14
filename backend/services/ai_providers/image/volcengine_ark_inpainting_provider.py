@@ -64,6 +64,33 @@ class VolcengineArkInpaintingProvider:
             logger.error(f"图片修复失败: {e}")
             return None
 
+    def inpaint_image(
+        self,
+        original_image: Image.Image,
+        mask_image: Image.Image,
+        inpaint_mode: str = "remove",
+        full_page_image: Optional[Image.Image] = None,
+        crop_box: Optional[tuple] = None
+    ) -> Optional[Image.Image]:
+        """
+        inpaint_image 方法，兼容 InpaintingService 接口
+
+        Args:
+            original_image: 原始图片
+            mask_image: 掩码图片（白色=要移除的区域，黑色=保留）
+            inpaint_mode: 修复模式（未使用，保留兼容性）
+            full_page_image: 完整页面图片（未使用，保留兼容性）
+            crop_box: 裁剪框（未使用，保留兼容性）
+
+        Returns:
+            修复后的图片
+        """
+        return self.inpaint(
+            image=original_image,
+            mask=mask_image,
+            prompt="移除图片中的文字和图标，生成干净的背景"
+        )
+
     def inpaint_bboxes(
         self,
         image: Image.Image,

@@ -137,6 +137,6 @@ echo
 echo "下一步："
 echo "1. cd frontend && npm install  # 安装前端依赖（包括 Playwright）"
 echo "2. cd frontend && npm run test:e2e  # 运行前端 E2E 测试"
-echo "3. cd backend && uv run pytest tests/integration/ -v  # 运行后端集成测试"
+echo "3. cd backend && pixi run pytest tests/integration/ -v  # 运行后端集成测试"
 echo
 

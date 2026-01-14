@@ -26,9 +26,9 @@ START_TIME=$(date +%s)
 # 1. Backend lint check
 echo -e "${BLUE}[1/4]${NC} Backend code check..."
 cd backend
-if command -v uv &> /dev/null; then
-    if uv run --quiet python -c "import flake8" 2>/dev/null; then
-        if ! uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics; then
+if command -v pixi &> /dev/null; then
+    if pixi run python -c "import flake8" 2>/dev/null; then
+        if ! pixi run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics; then
             echo -e "${RED}[FAIL]${NC} Backend lint check failed"
             exit 1
         fi
@@ -36,7 +36,7 @@ if command -v uv &> /dev/null; then
         echo -e "${YELLOW}[!] flake8 not installed, skipping backend lint${NC}"
     fi
 else
-    echo -e "${YELLOW}[!] uv not installed, skipping backend check${NC}"
+    echo -e "${YELLOW}[!] pixi not installed, skipping backend check${NC}"
 fi
 echo -e "${GREEN}[PASS]${NC} Backend check complete"
 cd ..
@@ -64,9 +64,9 @@ cd ..
 # 4. Backend unit tests
 echo -e "${BLUE}[4/4]${NC} Backend unit tests..."
 cd backend
-if command -v uv &> /dev/null; then
+if command -v pixi &> /dev/null; then
     if [ -d "tests/unit" ] && [ "$(ls -A tests/unit 2>/dev/null)" ]; then
-        uv run pytest tests/unit -v --tb=short 2>/dev/null || {
+        pixi run pytest tests/unit -v --tb=short 2>/dev/null || {
             echo -e "${YELLOW}[!] Backend tests failed or not configured${NC}"
         }
     else

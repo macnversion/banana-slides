@@ -16,7 +16,7 @@
 **运行方式**：
 ```bash
 cd backend
-uv run pytest tests/integration/test_full_workflow.py -v
+pixi run pytest tests/integration/test_full_workflow.py -v
 ```
 
 ### 2. Real Service 测试（需要运行服务）
@@ -39,7 +39,7 @@ docker compose up -d
 
 # 2. 运行测试
 cd backend
-uv run pytest tests/integration/test_api_full_flow.py -v -m "requires_service"
+pixi run pytest tests/integration/test_api_full_flow.py -v -m "requires_service"
 ```
 
 ## CI/CD 策略
@@ -99,7 +99,7 @@ GOOGLE_API_KEY: <real-api-key-from-secrets>
 ### 运行所有集成测试（跳过需要服务的）
 ```bash
 cd backend
-SKIP_SERVICE_TESTS=true uv run pytest tests/integration/ -v -m "not requires_service"
+SKIP_SERVICE_TESTS=true pixi run pytest tests/integration/ -v -m "not requires_service"
 ```
 
 ### 只运行需要服务的测试
@@ -109,7 +109,7 @@ docker compose up -d
 
 # 运行测试
 cd backend
-SKIP_SERVICE_TESTS=false uv run pytest tests/integration/ -v -m "requires_service"
+SKIP_SERVICE_TESTS=false pixi run pytest tests/integration/ -v -m "requires_service"
 ```
 
 ### 运行所有集成测试（需要服务）
@@ -119,18 +119,18 @@ docker compose up -d
 
 # 运行所有测试
 cd backend
-uv run pytest tests/integration/ -v
+pixi run pytest tests/integration/ -v
 ```
 
 ### 运行特定测试
 ```bash
 # 运行快速 API 测试（需要服务）
 cd backend
-uv run pytest tests/integration/test_api_full_flow.py::TestAPIFullFlow::test_quick_api_flow_no_ai -v
+pixi run pytest tests/integration/test_api_full_flow.py::TestAPIFullFlow::test_quick_api_flow_no_ai -v
 
 # 运行完整流程测试（需要服务和真实 API key）
 cd backend
-uv run pytest tests/integration/test_api_full_flow.py::TestAPIFullFlow::test_api_full_flow_create_to_export -v
+pixi run pytest tests/integration/test_api_full_flow.py::TestAPIFullFlow::test_api_full_flow_create_to_export -v
 ```
 
 ## 故障排除

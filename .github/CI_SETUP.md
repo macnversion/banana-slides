@@ -291,15 +291,15 @@ python3 --version
 # Node.js环境 (>= 18)
 node --version
 
-# UV包管理器
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Pixi包管理器
+curl -fsSL https://pixi.sh/install.sh | bash
 
 # Docker
 docker --version
 docker compose --version
 
-# 安装依赖
-uv sync --extra test
+# 安装依赖（在项目根目录运行）
+pixi install
 cd frontend && npm ci
 npx playwright install --with-deps chromium
 ```
@@ -309,7 +309,7 @@ npx playwright install --with-deps chromium
 ```bash
 # 后端单元测试
 cd backend
-uv run pytest tests/unit -v --cov=. --cov-report=html
+pixi run pytest tests/unit -v --cov=. --cov-report=html
 
 # 前端测试
 cd frontend
@@ -332,7 +332,7 @@ npx playwright test --ui
 
 # 后端调试模式
 cd backend
-uv run pytest tests/unit/test_xxx.py --pdb
+pixi run pytest tests/unit/test_xxx.py --pdb
 
 # 查看Docker日志
 docker compose logs backend

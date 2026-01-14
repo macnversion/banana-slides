@@ -21,20 +21,20 @@ jobs:
         with:
           python-version: '3.10'
       
-      - name: Install uv package manager
+      - name: Install Pixi package manager
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          curl -fsSL https://pixi.sh/install.sh | bash
+          echo "$HOME/.pixi/bin" >> $GITHUB_PATH
       
       - name: Backend syntax check
         run: |
-          # Use uv for consistency
-          uv pip install flake8 black
+          # Install flake8 and black via pip for quick check
+          pip install flake8 black
           cd backend
           # Check syntax errors
-          uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
           # Check code format
-          uv run black --check . || echo "Code format suggestion: run black ."
+          black --check . || echo "Code format suggestion: run black ."
         continue-on-error: true
       
       # Frontend checks
@@ -81,20 +81,20 @@ jobs:
         with:
           python-version: '3.10'
       
-      - name: Install uv package manager
+      - name: Install Pixi package manager
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          curl -fsSL https://pixi.sh/install.sh | bash
+          echo "$HOME/.pixi/bin" >> $GITHUB_PATH
       
       - name: Install dependencies
         run: |
-          uv sync
+          pixi install
       
       - name: Start backend and test
         run: |
           cd backend
           # Start in background
-          uv run python app.py &
+          pixi run python app.py &
           SERVER_PID=$!
           
           # Wait for startup

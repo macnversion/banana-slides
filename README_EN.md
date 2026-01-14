@@ -286,7 +286,7 @@ docker compose up -d
 
 #### Requirements
 - Python 3.10 or higher
-- [uv](https://github.com/astral-sh/uv) - Python package manager
+- [Pixi](https://pixi.sh) - Python package manager
 - Node.js 16+ and npm
 - Valid Google Gemini API Key
 
@@ -298,18 +298,18 @@ git clone https://github.com/Anionex/banana-slides
 cd banana-slides
 ```
 
-1. **Install uv (if not already installed)**
+1. **Install Pixi (if not already installed)**
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -fsSL https://pixi.sh/install.sh | bash
 ```
 
 2. **Install Dependencies**
 
 Run in the project root:
 ```bash
-uv sync
+pixi install
 ```
-This will automatically install all dependencies based on `pyproject.toml`.
+This will automatically install all dependencies based on `pixi.toml`.
 
 3. **Configure Environment Variables**
 
@@ -357,7 +357,7 @@ The frontend connects to the backend at `http://localhost:5000` by default. To c
 
 ```bash
 cd backend
-uv run alembic upgrade head && uv run python app.py
+pixi run alembic upgrade head && pixi run python app.py
 ```
 Backend will start at `http://localhost:5000`. Verify via `http://localhost:5000/health`.
 
@@ -384,7 +384,7 @@ Frontend will start at `http://localhost:3000`.
 ### Backend
 - **Language**: Python 3.10+
 - **Framework**: Flask 3.0
-- **Package Manager**: uv
+- **Package Manager**: Pixi
 - **Database**: SQLite + Flask-SQLAlchemy
 - **AI Capabilities**: Google Gemini API
 - **PPT Processing**: python-pptx
@@ -418,8 +418,9 @@ banana-slides/
 │   ├── instance/               # SQLite DB
 │   ├── exports/                # Exported files
 │   └── ...
-├── pyproject.toml              # Python project config
-├── uv.lock                     # uv lockfile
+├── pyproject.toml              # Python project config (pytest)
+├── pixi.toml                   # Pixi dependency config
+├── pixi.lock                   # Pixi lockfile
 ├── docker-compose.yml          # Docker Compose config
 ├── .env.example                 # Env template
 └── README.md                   # This file
