@@ -814,35 +814,35 @@ def export_editable_pptx_with_recursive_analysis_task(
     export_inpaint_method: str = 'generative',
     app=None
 ):
-     """
-     使用递归图片可编辑化分析导出可编辑PPTX的后台任务
+    """
+    使用递归图片可编辑化分析导出可编辑PPTX的后台任务
 
-     这是新的架构方法，使用ImageEditabilityService进行递归版面分析。
-     与旧方法的区别：
-     - 不再假设图片是16:9
-     - 支持任意尺寸和分辨率
-     - 递归分析图片中的子图和图表
-     - 更智能的坐标映射和元素提取
-     - 支持火山引擎视觉模型（vision）或 MinerU + 百度OCR（mineru/hybrid）
-     - 不需要 ai_service（使用 ImageEditabilityService 和视觉模型/MinerU）
+    这是新的架构方法，使用ImageEditabilityService进行递归版面分析。
+    与旧方法的区别：
+    - 不再假设图片是16:9
+    - 支持任意尺寸和分辨率
+    - 递归分析图片中的子图和图表
+    - 更智能的坐标映射和元素提取
+    - 支持火山引擎视觉模型（vision）或 MinerU + 百度OCR（mineru/hybrid）
+    - 不需要 ai_service（使用 ImageEditabilityService 和视觉模型/MinerU）
 
-     火山引擎视觉模式：
-     - 元素提取：VisionElementExtractor（火山引擎视觉OCR能力）
-     - 背景修复：GenerativeEditInpaintProvider（火山引擎Inpainting）
-     - 无需依赖MinerU和百度OCR
+    火山引擎视觉模式：
+    - 元素提取：VisionElementExtractor（火山引擎视觉OCR能力）
+    - 背景修复：GenerativeEditInpaintProvider（火山引擎Inpainting）
+    - 无需依赖MinerU和百度OCR
 
-     Args:
-         task_id: 任务ID
-         project_id: 项目ID
-         filename: 输出文件名
-         file_service: 文件服务实例
-         page_ids: 可选的页面ID列表（如果提供，只导出这些页面）
-         max_depth: 最大递归深度
-         max_workers: 并发处理数
-         export_extractor_method: 组件提取方法 ('vision', 'mineru', 'hybrid'，默认'vision')
-         export_inpaint_method: 背景修复方法 ('generative', 'baidu', 'hybrid'，默认'generative')
-         app: Flask应用实例
-     """
+    Args:
+        task_id: 任务ID
+        project_id: 项目ID
+        filename: 输出文件名
+        file_service: 文件服务实例
+        page_ids: 可选的页面ID列表（如果提供，只导出这些页面）
+        max_depth: 最大递归深度
+        max_workers: 并发处理数
+        export_extractor_method: 组件提取方法 ('vision', 'mineru', 'hybrid'，默认'vision')
+        export_inpaint_method: 背景修复方法 ('generative', 'baidu', 'hybrid'，默认'generative')
+        app: Flask应用实例
+    """
     logger.info(f"🚀 Task {task_id} started: export_editable_pptx_with_recursive_analysis (project={project_id}, depth={max_depth}, workers={max_workers}, extractor={export_extractor_method}, inpaint={export_inpaint_method})")
     
     if app is None:
