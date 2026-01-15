@@ -66,12 +66,12 @@
 
 <div align="center">
 
-| | |
-|:---:|:---:|
+|                                                                                                                     |                                                                                                                     |
+| :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/user-attachments/assets/d58ce3f7-bcec-451d-a3b9-ca3c16223644" width="500" alt="案例3"> | <img src="https://github.com/user-attachments/assets/c64cd952-2cdf-4a92-8c34-0322cbf3de4e" width="500" alt="案例2"> |
-| **软件开发最佳实践** | **DeepSeek-V3.2技术展示** |
+|                                                **软件开发最佳实践**                                                 |                                              **DeepSeek-V3.2技术展示**                                              |
 | <img src="https://github.com/user-attachments/assets/383eb011-a167-4343-99eb-e1d0568830c7" width="500" alt="案例4"> | <img src="https://github.com/user-attachments/assets/1a63afc9-ad05-4755-8480-fc4aa64987f1" width="500" alt="案例1"> |
-| **预制菜智能产线装备研发和产业化** | **钱的演变：从贝壳到纸币的旅程** |
+|                                         **预制菜智能产线装备研发和产业化**                                          |                                          **钱的演变：从贝壳到纸币的旅程**                                           |
 
 </div>
 
@@ -119,13 +119,13 @@
 <br>
 
 **🌟和notebooklm slide deck功能对比**
-| 功能 | notebooklm | 本项目 | 
-| --- | --- | --- |
-| 页数上限 | 15页 | **无限制** | 
-| 二次编辑 | 不支持 | **框选编辑+口头编辑** |
-| 素材添加 | 生成后无法添加 | **生成后自由添加** |
+| 功能     | notebooklm       | 本项目                      |
+| -------- | ---------------- | --------------------------- |
+| 页数上限 | 15页             | **无限制**                  |
+| 二次编辑 | 不支持           | **框选编辑+口头编辑**       |
+| 素材添加 | 生成后无法添加   | **生成后自由添加**          |
 | 导出格式 | 仅支持导出为 PDF | **导出为PDF、(可编辑)pptx** |
-| 水印 | 免费版有水印 | **无水印，自由增删元素** |
+| 水印     | 免费版有水印     | **无水印，自由增删元素**    |
 
 > 注：随着新功能添加,对比可能过时
 
@@ -146,24 +146,24 @@
 
 ## 🗺️ 开发计划
 
-| 状态 | 里程碑 |
-| --- | --- |
+| 状态     | 里程碑                                 |
+| -------- | -------------------------------------- |
 | ✅ 已完成 | 从想法、大纲、页面描述三种路径创建 PPT |
-| ✅ 已完成 | 解析文本中的 Markdown 格式图片 |
-| ✅ 已完成 | PPT 单页添加更多素材 |
-| ✅ 已完成 | PPT 单页框选区域Vibe口头编辑 |
-| ✅ 已完成 | 素材模块: 素材生成、上传等 |
-| ✅ 已完成 | 支持多种文件的上传+解析 |
-| ✅ 已完成 | 支持Vibe口头调整大纲和描述 |
-| ✅ 已完成 | 初步支持可编辑版本pptx文件导出 |
-| 🔄 进行中 | 支持多层次、精确抠图的可编辑pptx导出 |
-| 🔄 进行中 | 网络搜索 |
-| 🔄 进行中 | Agent 模式 |
-| 🧭 规划中 | 优化前端加载速度 |
-| 🧭 规划中 | 在线播放功能 |
-| 🧭 规划中 | 简单的动画和页面切换效果 |
-| 🧭 规划中 | 多语种支持 |
-| 🧭 规划中 | 用户系统 |
+| ✅ 已完成 | 解析文本中的 Markdown 格式图片         |
+| ✅ 已完成 | PPT 单页添加更多素材                   |
+| ✅ 已完成 | PPT 单页框选区域Vibe口头编辑           |
+| ✅ 已完成 | 素材模块: 素材生成、上传等             |
+| ✅ 已完成 | 支持多种文件的上传+解析                |
+| ✅ 已完成 | 支持Vibe口头调整大纲和描述             |
+| ✅ 已完成 | 初步支持可编辑版本pptx文件导出         |
+| 🔄 进行中 | 支持多层次、精确抠图的可编辑pptx导出   |
+| 🔄 进行中 | 网络搜索                               |
+| 🔄 进行中 | Agent 模式                             |
+| 🧭 规划中 | 优化前端加载速度                       |
+| 🧭 规划中 | 在线播放功能                           |
+| 🧭 规划中 | 简单的动画和页面切换效果               |
+| 🧭 规划中 | 多语种支持                             |
+| 🧭 规划中 | 用户系统                               |
 
 ## 📦 使用方法
 
@@ -195,7 +195,7 @@ cp .env.example .env
 编辑 `.env` 文件，配置必要的环境变量：
 > **项目中大模型接口以AIHubMix平台格式为标准，推荐使用 [AIHubMix](https://aihubmix.com/?aff=17EC) 获取API密钥，减小迁移成本**  
 ```env
-# AI Provider格式配置 (gemini / openai / vertex)
+# AI Provider格式配置 (gemini / openai / vertex / volcengine)
 AI_PROVIDER_FORMAT=gemini
 
 # Gemini 格式配置（当 AI_PROVIDER_FORMAT=gemini 时使用）
@@ -213,6 +213,13 @@ OPENAI_API_BASE=https://api.openai.com/v1
 # VERTEX_PROJECT_ID=your-gcp-project-id
 # VERTEX_LOCATION=global
 # GOOGLE_APPLICATION_CREDENTIALS=./gcp-service-account.json
+
+# 火山引擎配置（当 AI_PROVIDER_FORMAT=volcengine 时使用）
+# ARK_API_KEY=your-volcengine-api-key
+# ARK_API_BASE=https://ark.cn-beijing.volces.com/api/v3
+# TEXT_MODEL=ep-xxxxx  # 文本模型 endpoint ID
+# IMAGE_MODEL=ep-xxxxx  # 图像模型 endpoint ID（如 Seedream）
+# IMAGE_CAPTION_MODEL=ep-xxxxx  # 图像描述模型 endpoint ID（用于可编辑导出）
 ...
 ```
 
@@ -343,7 +350,7 @@ cp .env.example .env
 编辑 `.env` 文件，配置你的 API 密钥：
 > **项目中大模型接口以AIHubMix平台格式为标准，推荐使用 [AIHubMix](https://aihubmix.com/?aff=17EC) 获取API密钥，减小迁移成本** 
 ```env
-# AI Provider格式配置 (gemini / openai / vertex)
+# AI Provider格式配置 (gemini / openai / vertex / volcengine)
 AI_PROVIDER_FORMAT=gemini
 
 # Gemini 格式配置（当 AI_PROVIDER_FORMAT=gemini 时使用）
@@ -361,6 +368,12 @@ OPENAI_API_BASE=https://api.openai.com/v1
 # VERTEX_PROJECT_ID=your-gcp-project-id
 # VERTEX_LOCATION=global
 # GOOGLE_APPLICATION_CREDENTIALS=./gcp-service-account.json
+
+# 火山引擎配置（当 AI_PROVIDER_FORMAT=volcengine 时使用）
+# ARK_API_KEY=your-volcengine-api-key
+# ARK_API_BASE=https://ark.cn-beijing.volces.com/api/v3
+# TEXT_MODEL=ep-xxxxx  # 文本模型 endpoint ID
+# IMAGE_MODEL=ep-xxxxx  # 图像模型 endpoint ID（如 Seedream）
 
 PORT=5000
 ...
@@ -425,7 +438,7 @@ npm run dev
 - **框架**：Flask 3.0
 - **包管理**：Pixi
 - **数据库**：SQLite + Flask-SQLAlchemy
-- **AI能力**：Google Gemini API
+- **AI能力**：Google Gemini API / OpenAI API / 火山引擎方舟
 - **PPT处理**：python-pptx
 - **图片处理**：Pillow
 - **并发处理**：ThreadPoolExecutor

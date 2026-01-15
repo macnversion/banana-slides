@@ -62,12 +62,12 @@ However, the emergence of the nano banana🍌 model changed everything. I tried 
 
 <div align="center">
 
-| | |
-|:---:|:---:|
+|                                                                                                                      |                                                                                                                      |
+| :------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/user-attachments/assets/d58ce3f7-bcec-451d-a3b9-ca3c16223644" width="500" alt="Case 3"> | <img src="https://github.com/user-attachments/assets/c64cd952-2cdf-4a92-8c34-0322cbf3de4e" width="500" alt="Case 2"> |
-| **Software Development Best Practices** | **DeepSeek-V3.2 Technical Showcase** |
+|                                       **Software Development Best Practices**                                        |                                         **DeepSeek-V3.2 Technical Showcase**                                         |
 | <img src="https://github.com/user-attachments/assets/383eb011-a167-4343-99eb-e1d0568830c7" width="500" alt="Case 4"> | <img src="https://github.com/user-attachments/assets/1a63afc9-ad05-4755-8480-fc4aa64987f1" width="500" alt="Case 1"> |
-| **R&D and Industrialization of Smart Production Equipment for Prepared Dishes** | **Evolution of Money: A Journey from Shells to Banknotes** |
+|                   **R&D and Industrialization of Smart Production Equipment for Prepared Dishes**                    |                              **Evolution of Money: A Journey from Shells to Banknotes**                              |
 
 </div>
 
@@ -111,13 +111,13 @@ No longer restricted by complex menu buttons; issue modification commands direct
 <br>
 
 **🌟 Comparison with NotebookLM Slide Deck**
-| Feature | NotebookLM | This Project | 
-| --- | --- | --- |
-| Max Pages | 15 pages | **Unlimited** | 
-| Secondary Editing | Not supported | **Selection Editing + Verbal Editing** |
-| Adding Materials | Cannot add after generation | **Freely add after generation** |
-| Export Format | PDF only | **PDF, (Editable) PPTX** |
-| Watermark | Watermark in free version | **No watermark, free to add/delete elements** |
+| Feature           | NotebookLM                  | This Project                                  |
+| ----------------- | --------------------------- | --------------------------------------------- |
+| Max Pages         | 15 pages                    | **Unlimited**                                 |
+| Secondary Editing | Not supported               | **Selection Editing + Verbal Editing**        |
+| Adding Materials  | Cannot add after generation | **Freely add after generation**               |
+| Export Format     | PDF only                    | **PDF, (Editable) PPTX**                      |
+| Watermark         | Watermark in free version   | **No watermark, free to add/delete elements** |
 
 > Note: Comparison may become outdated as new features are added.
 
@@ -133,24 +133,24 @@ No longer restricted by complex menu buttons; issue modification commands direct
 
 ## 🗺️ Roadmap
 
-| Status | Milestone |
-| --- | --- |
-| ✅ Completed | Create PPT via Idea, Outline, or Page Description |
-| ✅ Completed | Parse Markdown formatted images in text |
-| ✅ Completed | Add more materials to individual PPT pages |
-| ✅ Completed | Box-selection Vibe verbal editing for individual pages |
-| ✅ Completed | Material module: Generation, uploading, etc. |
-| ✅ Completed | Support for uploading and parsing multiple file types |
-| ✅ Completed | Support Vibe verbal adjustments for outlines and descriptions |
-| ✅ Completed | Preliminary support for editable PPTX file export |
+| Status        | Milestone                                                          |
+| ------------- | ------------------------------------------------------------------ |
+| ✅ Completed   | Create PPT via Idea, Outline, or Page Description                  |
+| ✅ Completed   | Parse Markdown formatted images in text                            |
+| ✅ Completed   | Add more materials to individual PPT pages                         |
+| ✅ Completed   | Box-selection Vibe verbal editing for individual pages             |
+| ✅ Completed   | Material module: Generation, uploading, etc.                       |
+| ✅ Completed   | Support for uploading and parsing multiple file types              |
+| ✅ Completed   | Support Vibe verbal adjustments for outlines and descriptions      |
+| ✅ Completed   | Preliminary support for editable PPTX file export                  |
 | 🔄 In Progress | Support for multi-layered, precise matting in editable PPTX export |
-| 🔄 In Progress | Web search capability |
-| 🔄 In Progress | Agent mode |
-| 🧭 Planned | Optimize frontend loading speed |
-| 🧭 Planned | Online playback functionality |
-| 🧭 Planned | Simple animations and page transition effects |
-| 🧭 Planned | Multi-language support |
-| 🧭 Planned | User system |
+| 🔄 In Progress | Web search capability                                              |
+| 🔄 In Progress | Agent mode                                                         |
+| 🧭 Planned     | Optimize frontend loading speed                                    |
+| 🧭 Planned     | Online playback functionality                                      |
+| 🧭 Planned     | Simple animations and page transition effects                      |
+| 🧭 Planned     | Multi-language support                                             |
+| 🧭 Planned     | User system                                                        |
 
 ## 📦 How to Use
 
@@ -182,7 +182,7 @@ cp .env.example .env
 Edit the `.env` file and configure the necessary environment variables:
 > **The LLM interface in this project follows the AIHubMix platform format. It is recommended to use [AIHubMix](https://aihubmix.com/?aff=17EC) to obtain an API key to reduce migration costs.**  
 ```env
-# AI Provider format configuration (gemini / openai / vertex)
+# AI Provider format configuration (gemini / openai / vertex / volcengine)
 AI_PROVIDER_FORMAT=gemini
 
 # Gemini format configuration (used when AI_PROVIDER_FORMAT=gemini)
@@ -200,6 +200,13 @@ OPENAI_API_BASE=https://api.openai.com/v1
 # VERTEX_PROJECT_ID=your-gcp-project-id
 # VERTEX_LOCATION=global
 # GOOGLE_APPLICATION_CREDENTIALS=./gcp-service-account.json
+
+# Volcengine configuration (used when AI_PROVIDER_FORMAT=volcengine)
+# ARK_API_KEY=your-volcengine-api-key
+# ARK_API_BASE=https://ark.cn-beijing.volces.com/api/v3
+# TEXT_MODEL=ep-xxxxx  # Text model endpoint ID
+# IMAGE_MODEL=ep-xxxxx  # Image model endpoint ID (e.g., Seedream)
+# IMAGE_CAPTION_MODEL=ep-xxxxx  # Image caption model endpoint ID (for editable export)
 ...
 ```
 
@@ -321,7 +328,7 @@ cp .env.example .env
 Edit the `.env` file and configure your API keys:
 > **The LLM interface follows the AIHubMix platform standard. Use [AIHubMix](https://aihubmix.com/?aff=17EC) to get an API key.** 
 ```env
-# AI Provider format (gemini / openai / vertex)
+# AI Provider format (gemini / openai / vertex / volcengine)
 AI_PROVIDER_FORMAT=gemini
 
 # Gemini configuration
@@ -331,6 +338,12 @@ GOOGLE_API_BASE=https://generativelanguage.googleapis.com
 # OpenAI configuration
 OPENAI_API_KEY=your-api-key-here
 OPENAI_API_BASE=https://api.openai.com/v1
+
+# Volcengine configuration (used when AI_PROVIDER_FORMAT=volcengine)
+# ARK_API_KEY=your-volcengine-api-key
+# ARK_API_BASE=https://ark.cn-beijing.volces.com/api/v3
+# TEXT_MODEL=ep-xxxxx  # Text model endpoint ID
+# IMAGE_MODEL=ep-xxxxx  # Image model endpoint ID (e.g., Seedream)
 
 PORT=5000
 ...
@@ -386,7 +399,7 @@ Frontend will start at `http://localhost:3000`.
 - **Framework**: Flask 3.0
 - **Package Manager**: Pixi
 - **Database**: SQLite + Flask-SQLAlchemy
-- **AI Capabilities**: Google Gemini API
+- **AI Capabilities**: Google Gemini API / OpenAI API / Volcengine Ark
 - **PPT Processing**: python-pptx
 - **Image Processing**: Pillow
 - **Concurrency**: ThreadPoolExecutor
