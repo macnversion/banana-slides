@@ -269,7 +269,7 @@ def export_editable_pptx(project_id):
         app = current_app._get_current_object()
         
         # 读取项目的导出设置
-        export_extractor_method = project.export_extractor_method or 'hybrid'
+        export_extractor_method = project.export_extractor_method or 'vision'
         export_inpaint_method = project.export_inpaint_method or 'hybrid'
         logger.info(f"Export settings: extractor={export_extractor_method}, inpaint={export_inpaint_method}")
         

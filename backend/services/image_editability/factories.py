@@ -593,9 +593,12 @@ class ServiceConfig:
             if upload_folder is None:
                 upload_folder = './uploads'
         
-        # 验证必需配置
+        # 验证必需配置：如果需要 MinerU 但未配置，自动降级到 Vision 模式
         if not mineru_token:
-            raise ValueError("MinerU token is required. Please configure MINERU_TOKEN.")
+            if use_hybrid_extractor or (not use_vision_extractor):
+                logger.warning("⚠️ MinerU token 未配置，自动降级到 Vision 模式（使用火山引擎视觉模型）")
+                use_vision_extractor = True
+                use_hybrid_extractor = False
         
         from services.file_parser_service import FileParserService
         
